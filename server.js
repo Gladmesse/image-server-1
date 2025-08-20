@@ -1,11 +1,19 @@
-const express = require('express');
+const express = require("express");
 const cors = require("cors");
-const multer = require('multer');
-const path = require('path');
 const app = express();
+
+// Aktivér CORS
 app.use(cors());
 
+// Gør uploads mappen statisk
 app.use('/uploads', express.static('uploads'));
+
+// Din upload route
+app.post("/upload", upload.single("file"), (req, res) => {
+  const fileUrl = `/uploads/${req.file.filename}`;
+  const fullUrl = `${req.protocol}://${req.get("host")}${fileUrl}`;
+  res.json({ url: fullUrl });
+});
 
 const PORT = process.env.PORT || 3000;
 
