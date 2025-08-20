@@ -3,6 +3,8 @@ const multer = require('multer');
 const path = require('path');
 const app = express();
 
+app.use('/uploads', express.static('uploads'));
+
 const PORT = process.env.PORT || 3000;
 
 // Opret storage til uploads
