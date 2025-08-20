@@ -1,15 +1,11 @@
 // server.js eller index.js
 
 const express = require("express");
-const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Aktiver CORS
-app.use(cors());
 
 // Gør uploads-mappen statisk
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -39,7 +35,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("Serveren kører! Brug POST /upload for at uploade billeder.");
+  res.send("Serveren kører! Brug POST /upload med Postman for at uploade billeder.");
 });
 
 // Start server
