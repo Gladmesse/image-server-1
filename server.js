@@ -1,49 +1,48 @@
+// server.js eller index.js
+
 const express = require("express");
 const cors = require("cors");
-const app = express();
+const multer = require("multer");
+const path = require("path");
 
-// Aktivér CORS
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Aktiver CORS
 app.use(cors());
 
-// Gør uploads mappen statisk
-app.use('/uploads', express.static('uploads'));
+// Gør uploads-mappen statisk
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Din upload route
-app.post("/upload", upload.single("file"), (req, res) => {
+// Multer opsætning til fil-upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + path.extname(file.originalname);
+    cb(null, uniqueSuffix);
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// Én upload-route
+app.post("/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Ingen fil uploadet" });
+  }
   const fileUrl = `/uploads/${req.file.filename}`;
   const fullUrl = `${req.protocol}://${req.get("host")}${fileUrl}`;
   res.json({ url: fullUrl });
 });
 
-const PORT = process.env.PORT || 3000;
-
-// Opret storage til uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + path.extname(file.originalname);
-    cb(null, uniqueSuffix)
-  }
-})
-
-const upload = multer({ storage: storage });
-
-
-  // byg det fulde link med domæne
-  const fullUrl = `${req.protocol}://${req.get("host")}${fileUrl}`;
-  
-  // send svaret tilbage
-  res.json({ url: fullUrl });
-});
-
 // Test route
-app.get('/', (req, res) => {
-  res.send('Serveren kører! Brug POST /upload for at uploade billeder.');
+app.get("/", (req, res) => {
+  res.send("Serveren kører! Brug POST /upload for at uploade billeder.");
 });
 
-// Server starter
+// Start server
 app.listen(PORT, () => {
-  console.log(`Serveren kører på port ${PORT}`);
+  console.log(`Server kører på port ${PORT}`);
 });
