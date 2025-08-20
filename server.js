@@ -1,5 +1,3 @@
-// server.js eller index.js
-
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
@@ -10,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Gør uploads-mappen statisk
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Multer opsætning til fil-upload
+// Multer opsætning
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -23,22 +21,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Én upload-route
+// Upload-route
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "Ingen fil uploadet" });
   }
-  const fileUrl = `/uploads/${req.file.filename}`;
-  const fullUrl = `${req.protocol}://${req.get("host")}${fileUrl}`;
+  const fullUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
   res.json({ url: fullUrl });
 });
 
-// Test route
+// Test
 app.get("/", (req, res) => {
-  res.send("Serveren kører! Brug POST /upload med Postman for at uploade billeder.");
+  res.send("Serveren kører! Brug POST /upload med Postman.");
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server kører på port ${PORT}`);
 });
