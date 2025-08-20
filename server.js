@@ -19,11 +19,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Enkelt upload route
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'Ingen fil uploadet' });
-  }
-  res.json({ url: `/uploads/${req.file.filename}` });
+app.post("/upload", upload.single("file"), (req, res) => {
+  // den relative sti til filen
+  const fileUrl = `/uploads/${req.file.filename}`;
+  
+  // byg det fulde link med domæne
+  const fullUrl = `${req.protocol}://${req.get("host")}${fileUrl}`;
+  
+  // send svaret tilbage
+  res.json({ url: fullUrl });
 });
 
 // Test route
